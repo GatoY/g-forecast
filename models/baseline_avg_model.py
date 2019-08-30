@@ -8,33 +8,36 @@ import mlflow.sklearn
 
 # %%
 class AvgModel(object):
-    def __init__(self, pred_label='', max_train_days=-1):
-        self.pred_label = pred_label
-        self.max_train_days = max_train_days
-        self.model = {}
+    def __init__(
+                self, 
+                label,
+                train_days):
+        self.label = label 
+        self.train_days = train_days
         return
 
-    def averaging_by_week(self, df_store, column):
+    def averaging_by_weekday(self, df_store, column):
         """
         
         """
         result = {}
         for k in range(7):
             chunk = df_store[df_store['weekday'] == k]
-            if self.max_train_days > 0:
+            if self.train_days > 0:
                 start_date = chunk['dateTime'].iloc[-1] - \
-                    pd.Timedelta(days=self.max_train_days)
+                    pd.Timedelta(days=self.train_days)
                 chunk = chunk[chunk['dateTime'] >= start_date]
                 # print(chunk)
             result[k] = chunk[column].mean()
         return result
 
     def fit(self, df):
-        stores = df['storeId'].unique()
-        for store_id in stores:
+        self.model = {}
+        store_list = df['storeId'].unique()
+        for store_id in store_list:
             df_store = df[df['storeId'] == store_id]
-            self.model[store_id] = self.averaging_by_week(
-                df_store, self.pred_label)
+            self.model[store_id] = self.averaging_by_weekday(
+                df_store, self.label)
         return
 
     def predict(self, df):
