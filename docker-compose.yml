@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  anchoring:
+    image: "g-forecast:${DOCKER_TAG:-latest}"
+    container_name: "g-forecast"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      labels:
+        - "build.number=${BUILD_NUMBER:-no-build-number}"
+        - "build.commit=${GIT_COMMIT_HASH:-no-commit-hash}"
+    ports:
+      - "8900:8900"
+    volumes:
+     - ./:/g-forecast
