@@ -47,36 +47,9 @@ from featureEng import (
 )
 
 
-def fetch_data(start_date, end_date, STOREID_LIST):
+def load_data(start_date, end_date, STOREID_LIST):
     logger.debug('Start date: %s and end date: %s' % (start_date, end_date))
     logger.debug('Get foot traffic data')
-    cnx = pymysql.connect(user=MYSQL_USER, password=MYSQL_PASSWORD,
-                          host=MYSQL_HOST,
-                          database=MYSQL_DB)
-    query = ("""
-    SELECT 
-    Stats.dateTime AS dateTime,
-    MONTH(Stats.dateTime) AS month,
-    WEEKDAY(Stats.dateTime) AS weekday,
-    Stats.outsideOpportunity AS Outside,
-    Stats.totalVisitors AS Inside,
-    Stats.sales AS Sales,
-    Stats.storeId
-    FROM
-    Kepler.Stats
-        INNER JOIN
-    Kepler.Store ON Stats.storeId = Store.storeId
-        INNER JOIN
-    Kepler.StoresLocation ON Store.storeId = StoresLocation.storeId
-    WHERE
-    Stats.Duration = 2
-        AND Stats.totalVisitors != 0
-        AND Sales > 0
-        AND dateTime > '%s'
-        AND dateTime <= '%s' AND Store.storeId in %s
-            """ % (str(start_date), str(end_date), STOREID_LIST))
-
-    sql_data = pd.read_sql(query, cnx)
     return sql_data
 
 

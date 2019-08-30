@@ -6,6 +6,7 @@ import os
 import datetime
 import math
 
+import load_data
 from util_log import logger
 from featureEng import (
     lagging,
@@ -43,63 +44,6 @@ from config import (
 )
 
 
-def fetch_data(end_date):
-    cnx = pymysql.connect(user=MYSQL_USER, password=MYSQL_PASSWORD,
-                          host=MYSQL_HOST,
-                          database=MYSQL_DB)
-    if len(STOREID_LIST) > 1:
-        query = ("""
-        SELECT 
-        Stats.dateTime AS dateTime,
-        MONTH(Stats.dateTime) AS month,
-        WEEKDAY(Stats.dateTime) AS weekday,
-        Stats.outsideOpportunity AS Outside,
-        Stats.totalVisitors AS Inside,
-        Stats.sales AS Sales,
-        Stats.storeId
-        FROM
-        Kepler.Stats
-            INNER JOIN
-        Kepler.Store ON Stats.storeId = Store.storeId
-            INNER JOIN
-        Kepler.StoresLocation ON Store.storeId = StoresLocation.storeId
-        WHERE
-        Stats.Duration = 2
-            AND Stats.totalVisitors != 0
-            AND Sales > 0
-            AND dateTime > StoresLocation.startDate
-            AND dateTime < '%s' AND Store.storeId in %s
-                """ % (str(end_date), STOREID_LIST))
-    elif len(STOREID_LIST) == 1:
-        query = ("""
-        SELECT 
-        Stats.dateTime AS dateTime,
-        MONTH(Stats.dateTime) AS month,
-        WEEKDAY(Stats.dateTime) AS weekday,
-        Stats.outsideOpportunity AS Outside,
-        Stats.totalVisitors AS Inside,
-        Stats.sales AS Sales,
-        Stats.storeId
-        FROM
-        Kepler.Stats
-            INNER JOIN
-        Kepler.Store ON Stats.storeId = Store.storeId
-            INNER JOIN
-        Kepler.StoresLocation ON Store.storeId = StoresLocation.storeId
-        WHERE
-        Stats.Duration = 2
-            AND Stats.totalVisitors != 0
-            AND Sales > 0
-            AND dateTime > StoresLocation.startDate
-            AND dateTime < '%s' AND Store.storeId = %s
-                """ % (str(end_date), STOREID_LIST[0]))
-    else:
-        logger.debug('Please type in storeId in config.yaml')
-
-    sql_data = pd.read_sql(query, cnx)
-    return sql_data
-
-
 def main():
     # Valid period,  [VALID_START_DATE, VALID_END_DATE)
     VALID_END_DATE = datetime.datetime.strptime(PREDICT_START_DATE, '%Y-%m-%d')
@@ -107,7 +51,7 @@ def main():
 
     logger.debug('Get foot traffic data')
     # fetch raw data
-    sql_data = fetch_data(VALID_END_DATE)
+    sql_data = load_data(VALID_END_DATE)
     if sql_data['dateTime'].max() != VALID_END_DATE:
         logger.debug('data integrity check failed!')
     sql_data.to_csv(PREDICT_DATASET_DIR + 'raw_data.csv', index=False)
