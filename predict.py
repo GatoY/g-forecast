@@ -36,7 +36,7 @@ from config import (
     PREDICT_TMP_DIR,
     PREDICT_MODEL_DIR,
 )
-
+import load_data
 from featureEng import (
     lagging,
     sliding_window,
@@ -45,12 +45,6 @@ from featureEng import (
     gen_datasets,
     train_valid_split
 )
-
-
-def load_data(start_date, end_date, STOREID_LIST):
-    logger.debug('Start date: %s and end date: %s' % (start_date, end_date))
-    logger.debug('Get foot traffic data')
-    return sql_data
 
 
 def gen_future_sets(data,

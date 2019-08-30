@@ -45,17 +45,18 @@ from config import (
 
 
 def main():
-    # Valid period,  [VALID_START_DATE, VALID_END_DATE)
-    VALID_END_DATE = datetime.datetime.strptime(PREDICT_START_DATE, '%Y-%m-%d')
-    VALID_START_DATE = VALID_END_DATE-datetime.timedelta(days=PREDICT_LENGTH)
-
-    logger.debug('Get foot traffic data')
+    
+    logger.debug('Get raw data')
     # fetch raw data
-    sql_data = load_data(VALID_END_DATE)
-    if sql_data['dateTime'].max() != VALID_END_DATE:
-        logger.debug('data integrity check failed!')
-    sql_data.to_csv(PREDICT_DATASET_DIR + 'raw_data.csv', index=False)
+    raw_data = load_data()
+    
 
+
+    # Valid period,  [VALID_START_DATE, VALID_END_DATE)
+    # VALID_END_DATE = datetime.datetime.strptime(PREDICT_START_DATE, '%Y-%m-%d')
+    # VALID_START_DATE = VALID_END_DATE-datetime.timedelta(days=PREDICT_LENGTH)
+
+    
     storeId_list = sql_data.storeId.unique()
     logger.debug('Filling missing value, lag, sliding window')
     for storeId, count in zip(storeId_list, range(len(storeId_list))):
