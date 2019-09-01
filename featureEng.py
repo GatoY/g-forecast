@@ -74,57 +74,10 @@ def filling_missing_value(df,
     return df
 
 
-def lagging(df,
-            lag_len=50,
-            lag_cols=['Sales']
-            ):
-    """ Generate lagging features.
-    Args:
-        df: a DataFrame, contains all columns in cols_lag
-        len_lag: Int, the length of lagging features
-        cols_lag: List of String, the columns needs to generate lagging features 
-
-    Returns:
-        df: a DataFrame with lagging features, for example 'Sales_lag_1'.
-    """
-
-    # lag
-    for lag in range(1, lag_len):
-        for col in lag_cols:
-            d_lag = df.shift(periods=lag)
-            df[col + '_lag_' + str(lag)] = d_lag[col]
-    return df
 
 
-def sliding_window(df,
-                   sliding_window_len=50,
-                   sliding_cols=['Sales']
-                   ):
-    """ Generate sliding window features.
-    Args:
-        df: a DataFrame, contains all columns in cols_lag
-        len_sliding_window: Int, the length of sliding window, >2 
-        cols_sliding: List of String, the columns needs to generate sliding window features 
-
-    Returns:
-        df: a DataFrame with sliding window features, for example 'Sales_mean_2'.
-    """
-
-    def roll(data, roll_size, col):
-        roll = data[col].shift(1).rolling(roll_size)
-        data[col + '_mean_' + str(roll_size)] = roll.mean()
-        data[col + '_std_' + str(roll_size)] = roll.std()
-        data[col + '_max_' + str(roll_size)] = roll.max()
-        data[col + '_min_' + str(roll_size)] = roll.min()
-        return data
 
 
-    for roll_size in range(2, sliding_window_len): 
-        for col in sliding_cols:
-            df = roll(df, roll_size, col)
-
-    df = df.dropna()
-    return df
 
 
 def add_influence(df,
@@ -178,43 +131,7 @@ def filter_peak_period(df,
     return df
 
 
-def gen_datasets(df,
-                 dataset_dir,
-                 PREDICT_LENGTH,
-                 changing_cols=['month', 'weekday', 'Inside', 'influence']
-                 ):
-    """ Generate train test sets for PREDICT_LENGTH of models.
-    Args:
-        df: a DataFrame
-        dataset_dir: String, a dir to record train test sets.
 
-    Returns:
-        train_frame_dict: a Dict: {Int: Dataframe}
-    """
-
-    storeId_list = df.storeId.unique()
-    train_frame_dict = {}
-
-    for i in range(PREDICT_LENGTH):
-        # i_frame: ith model
-        count = 0
-        logger.debug('for the %sth model' % i)
-
-        for storeId in storeId_list:
-            d = df[df['storeId'] == storeId]
-            t = d[changing_cols].shift(-i)
-            d[changing_cols] = t[changing_cols]
-
-            if count == 0:
-                i_frame = d
-            else:
-                i_frame = pd.concat([i_frame, d])
-            count += 1
-
-        i_frame = i_frame.dropna()
-        i_frame.to_csv(dataset_dir + str(i) + '.csv', index=False)
-        train_frame_dict[i] = i_frame
-    return train_frame_dict
 
 
 def onehot(df):

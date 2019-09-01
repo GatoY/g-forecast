@@ -114,3 +114,7 @@ exp_baselines
 tmp_data
 mlruns
 *.bak
+datasets/
+feature_sets/
+catboost_info/
+__pycache__/

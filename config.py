@@ -3,52 +3,18 @@ import json
 import os
 import numpy as np
 
-def load_config(filepath):
-    with open(filepath) as f:
-        config = yaml.load(f)
 
-    print('-------------------------------------------------------------')
-    print('configurations: ')
-    print(json.dumps(config['config'], indent=2))
-    print('-------------------------------------------------------------')
+LAG_DICT = {'unit_sales': [1,2,5,7,14,21,28,35],
+            'onpromotion': [14, 60]}
 
-    return config['config']
-
-
-CONFIG = load_config('config.yaml')
-
-STOREID_LIST = tuple(CONFIG['storeId'])
-
-INFLUENCE_SHEET = CONFIG['influence_sheet']
-INFLUENCE_MIN = CONFIG['influence_min']
-INFLUENCE_MAX = CONFIG['influence_max']
-
-
-PREDICT_START_DATE = CONFIG['predict_start_date']
-PREDICT_LENGTH = CONFIG['predict_length']
-LAG_LENGTH = CONFIG['lag_length']
-
-LAG_COLS = CONFIG['lag_cols']
-
-SLIDING_WINDOW_LENGTH = CONFIG['sliding_window_length']
-SLIDING_COLS = CONFIG['sliding_cols']
-
-MODEL_LIST = CONFIG['model_list']
-
+SLIDING_DICT = {'unit_sales': [3, 7, 14, 30, 60]}
 
 # initialise dirs
-PREIDCT_DATA_DIR = 'datasets/'
-PREDICT_DATASET_DIR = 'datasets/{}/'.format(PREDICT_START_DATE)
-PREDICT_TMP_DIR = 'datasets/{}/train_test/'.format(PREDICT_START_DATE)
-PREDICT_MODEL_DIR = 'datasets/{}/models/'.format(PREDICT_START_DATE)
+RAW_DATA_DIR = 'datasets/'
+FEATURE_DIR = 'feature_sets/'
 
-if not os.path.exists(PREIDCT_DATA_DIR):
-    os.system('mkdir '+PREIDCT_DATA_DIR)
-if not os.path.exists(PREDICT_DATASET_DIR):
-    os.system('mkdir ' + PREDICT_DATASET_DIR)
-if not os.path.exists(PREDICT_TMP_DIR):
-    os.system('mkdir ' + PREDICT_TMP_DIR)
-if not os.path.exists(PREDICT_MODEL_DIR):
-    os.system('mkdir ' + PREDICT_MODEL_DIR)
 
-PEAK_PERIOD = np.reshape(np.array(CONFIG['peak_period']),[-1,2]).tolist()
+if not os.path.exists(RAW_DATA_DIR):
+    os.system('mkdir '+RAW_DATA_DIR)
+
+# PEAK_PERIOD = np.reshape(np.array(CONFIG['peak_period']),[-1,2]).tolist()
