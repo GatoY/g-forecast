@@ -1,0 +1,9 @@
+numpy
+sklearn
+torch
+pytest
+tensorboardX
+tqdm
+matplotlib
+pillow
+torchvision
