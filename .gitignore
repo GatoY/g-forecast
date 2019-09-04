@@ -118,3 +118,4 @@ datasets/
 feature_sets/
 catboost_info/
 __pycache__/
+submission_files/
